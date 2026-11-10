@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#2d6a4f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Garden Blocks" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <title>School Garden Blocks</title>
+  <style>
+    :root {
+      --primary: #2d6a4f;
+      --primary-dark: #1b4332;
+      --primary-light: #40916c;
+      --accent: #52b788;
+      --bg: #f0f7f4;
+      --card: #ffffff;
+      --text: #1a2e22;
+      --muted: #6b7280;
+      --border: #d1e7dd;
+      --danger: #dc2626;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --nav-height: 64px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      overscroll-behavior: none;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      min-height: 100dvh;
+    }
+    .app-header {
+      background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+      color: white;
+      padding: 0.9rem 1rem 0.85rem;
+      padding-top: max(0.9rem, env(safe-area-inset-top));
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: white;
+      font-size: 1.15rem;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 1rem;
+      padding-bottom: calc(var(--nav-height) + 1.25rem + var(--safe-bottom));
+    }
+    .view { display: none; animation: fadeIn 0.2s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+    .stat-card .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .stat-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-top: 0.15rem;
+    }
+    .stat-card .sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.85rem;
+    }
+    .section-title h2 {
+      font-size: 1.05rem;
+      font-weight: 650;
+      color: var(--primary-dark);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.65rem 1rem;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 1.5px solid var(--border);
+    }
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+    .btn-sm {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+      border-radius: 9px;
+    }
+    .fab {
+      position: fixed;
+      right: 1.1rem;
+      bottom: calc(var(--nav-height) + 1rem + var(--safe-bottom));
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.6rem;
+      box-shadow: 0 6px 20px rgba(45, 106, 79, 0.4);
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .fab:active { transform: scale(0.94); }
+    .blocks-list, .activity-list { display: flex; flex-direction: column; gap: 0.9rem; }
+    .block-card, .record-card, .photo-card {
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+    .block-header {
+      background: linear-gradient(135deg, #d8f3dc, #b7e4c7);
+      padding: 0.9rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .block-header h3 {
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+      line-height: 1.3;
+    }
+    .block-loc {
+      font-size: 0.78rem;
+      color: #2d6a4f;
+      margin-top: 0.15rem;
+      opacity: 0.9;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .badge-active { background: #dcfce7; color: #166534; }
+    .badge-fallow { background: #f3f4f6; color: #4b5563; }
+    .badge-harvest { background: #fef3c7; color: #92400e; }
+    .badge-sale { background: #dbeafe; color: #1e40af; }
+    .badge-feed { background: #fce7f3; color: #9d174d; }
+    .badge-photo { background: #fef3c7; color: #92400e; }
+    .block-body { padding: 0.85rem 1rem 1rem; }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+    .crop-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #ecfdf5;
+      color: var(--primary);
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin: 0.2rem 0.25rem 0.2rem 0;
+    }
+    .crop-chip small { opacity: 0.7; font-weight: 400; }
+    .block-actions {
+      display: flex;
+      gap: 0.45rem;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .activity-item {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+    }
+    .act-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #d8f3dc;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .act-body { flex: 1; min-width: 0; }
+    .act-title { font-weight: 650; font-size: 0.95rem; }
+    .act-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+    .act-notes { font-size: 0.82rem; color: #4b5563; margin-top: 0.35rem; line-height: 1.4; }
+    .act-photo {
+      margin-top: 0.5rem;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .act-photo img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+    }
+    .chip-row {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.9rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: white;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .plant-card, .record-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      margin-bottom: 0.7rem;
+    }
+    .plant-card h4, .record-card h4 { font-size: 1rem; color: var(--primary-dark); }
+    .plant-card .variety { font-size: 0.8rem; color: var(--muted); }
+    .plant-details, .record-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      font-size: 0.82rem;
+    }
+    .plant-details span, .record-details span { color: var(--muted); }
+    .plant-details strong, .record-details strong { color: var(--text); font-weight: 600; }
+    .amount { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); }
+    .amount.money { color: #1e40af; }
+    .empty {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: var(--muted);
+    }
+    .empty .emoji { font-size: 2.8rem; margin-bottom: 0.6rem; opacity: 0.6; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: calc(var(--nav-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 50;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.4rem 0;
+    }
+    .nav-item .nav-icon { font-size: 1.3rem; line-height: 1; }
+    .nav-item.active { color: var(--primary); }
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet {
+      background: white;
+      width: 100%;
+      max-width: 480px;
+      max-height: 92dvh;
+      border-radius: 20px 20px 0 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.28s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: none; }
+    }
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #d1d5db;
+      border-radius: 2px;
+      margin: 0.6rem auto 0;
+    }
+    .sheet-header {
+      padding: 0.75rem 1.25rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .sheet-header h3 { font-size: 1.1rem; font-weight: 650; }
+    .sheet-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: #f3f4f6;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: #6b7280;
+    }
+    .sheet-body {
+      padding: 1.1rem 1.25rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .sheet-footer {
+      padding: 0.85rem 1.25rem;
+      padding-bottom: max(0.85rem, var(--safe-bottom));
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      gap: 0.6rem;
+    }
+    .sheet-footer .btn { flex: 1; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.35rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fafafa;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    /* Photo picker */
+    .photo-picker {
+      border: 2px dashed #d1e7dd;
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+      background: #f8faf9;
+      position: relative;
+    }
+    .photo-picker.has-image {
+      border-style: solid;
+      padding: 0.5rem;
+    }
+    .photo-preview {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: none;
+    }
+    .photo-preview.show { display: block; }
+    .photo-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .photo-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .hidden-file {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+    /* Photo gallery grid */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+    .photo-card {
+      position: relative;
+    }
+    .photo-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+    }
+    .photo-card .photo-info {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.78rem;
+    }
+    .photo-card .photo-info strong {
+      display: block;
+      color: var(--primary-dark);
+      margin-bottom: 0.15rem;
+    }
+    .photo-card .photo-meta {
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: max(1rem, env(safe-area-inset-top));
+      right: 1rem;
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    .toast {
+      position: fixed;
+      bottom: calc(var(--nav-height) + 1.5rem + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--primary-dark);
+      color: white;
+      padding: 0.75rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 200;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    /* Report overlay */
+    .report-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 150;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .report-overlay.open { display: flex; }
+    .report-panel {
+      background: white;
+      width: 100%;
+      max-width: 480px;
+      max-height: 92dvh;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .report-toolbar {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .report-toolbar h3 {
+      flex: 1;
+      font-size: 1.05rem;
+      min-width: 100px;
+    }
+    .report-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.15rem 2rem;
+      font-size: 0.9rem;
+    }
+    .report-body h1 {
+      font-size: 1.25rem;
+      color: var(--primary-dark);
+      margin-bottom: 0.25rem;
+    }
+    .report-body .report-meta {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 1.25rem;
+    }
+    .report-body h2 {
+      font-size: 1rem;
+      color: var(--primary);
+      margin: 1.25rem 0 0.5rem;
+      border-bottom: 2px solid #d8f3dc;
+      padding-bottom: 0.3rem;
+    }
+    .report-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-bottom: 0.5rem;
+    }
+    .report-body th, .report-body td {
+      text-align: left;
+      padding: 0.4rem 0.35rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .report-body th {
+      font-weight: 600;
+      color: #374151;
+      background: #f0fdf4;
+    }
+    .report-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .report-stat {
+      background: #f0fdf4;
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+    }
+    .report-stat .rl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+    .report-stat .rv { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); }
+
+    @media print {
+      body * { visibility: hidden !important; }
+      .report-overlay, .report-overlay * { visibility: visible !important; }
+      .report-overlay {
+        position: absolute !important;
+        inset: 0 !important;
+        background: white !important;
+        display: block !important;
+      }
+      .report-panel {
+        max-height: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .report-toolbar { display: none !important; }
+      .report-body { overflow: visible !important; padding: 0 !important; }
+      .bottom-nav, .fab, .app-header, .toast, .sheet-overlay, .lightbox { display: none !important; }
+    }
+    .install-banner {
+      display: none;
+      background: #ecfdf5;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .install-banner.show { display: flex; }
+    .install-banner p {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--primary-dark);
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+      margin-bottom: 1.4rem;
+    }
+    .quick-btn {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      cursor: pointer;
+    }
+    .quick-btn .qa-icon { font-size: 1.5rem; }
+    .quick-btn:active {
+      background: #f0fdf4;
+      border-color: var(--accent);
+    }
+    .sub-tabs {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+      background: #e8f5e9;
+      padding: 0.3rem;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .sub-tab {
+      flex: 1;
+      min-width: fit-content;
+      text-align: center;
+      padding: 0.5rem 0.5rem;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .sub-tab.active {
+      background: white;
+      color: var(--primary-dark);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-icon">🥬</div>
+        <span>Garden Blocks</span>
+      </div>
+      <button class="icon-btn" id="btn-install" title="Install app" style="display:none">⬇️</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="install-banner" id="install-banner">
+        <p>Install this app on your phone for offline access.</p>
+        <button class="btn btn-primary btn-sm" id="btn-install-banner">Install</button>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="openSheet('harvest')">
+          <span class="qa-icon">🧺</span> Log Harvest
+        </button>
+        <button class="quick-btn" onclick="openSheet('activity')">
+          <span class="qa-icon">💧</span> Log Task
+        </button>
+        <button class="quick-btn" onclick="openSheet('sale')">
+          <span class="qa-icon">💰</span> Record Sale
+        </button>
+        <button class="quick-btn" onclick="openSheet('feeding')">
+          <span class="qa-icon">🍽️</span> Feeding Use
+        </button>
+      </div>
+      <div style="margin-bottom:1.2rem">
+        <button class="btn btn-primary" onclick="openReport()" style="width:100%;padding:0.85rem;font-size:0.95rem">
+          📄 View / Print / Download Report
+        </button>
+      </div>
+      <div class="section-title"><h2>Recent Activity</h2></div>
+      <div class="activity-list" id="recent-activities"></div>
+    </section>
+
+    <!-- BLOCKS -->
+    <section id="view-blocks" class="view">
+      <div class="section-title">
+        <h2>Garden Blocks</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSheet('block')">+ New</button>
+      </div>
+      <div class="blocks-list" id="blocks-list"></div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="view-activities" class="view">
+      <div class="section-title">
+        <h2>Activities</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSheet('activity')">+ Log</button>
+      </div>
+      <div class="chip-row" id="activity-filters">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="watering">Watering</button>
+        <button class="chip" data-filter="weeding">Weeding</button>
+        <button class="chip" data-filter="planting">Planting</button>
+        <button class="chip" data-filter="harvest">Harvest</button>
+        <button class="chip" data-filter="other">Other</button>
+      </div>
+      <div class="activity-list" id="all-activities"></div>
+    </section>
+
+    <!-- PRODUCE: Crops | Sales | Feeding | Photos -->
+    <section id="view-produce" class="view">
+      <div class="sub-tabs" id="produce-tabs">
+        <button class="sub-tab active" data-sub="crops">Crops</button>
+        <button class="sub-tab" data-sub="harvests">Harvest</button>
+        <button class="sub-tab" data-sub="sales">Sales</button>
+        <button class="sub-tab" data-sub="feeding">Feeding</button>
+        <button class="sub-tab" data-sub="photos">Photos</button>
+      </div>
+
+      <div id="sub-crops">
+        <div class="section-title">
+          <h2>Crops & Plantings</h2>
+          <button class="btn btn-primary btn-sm" onclick="openSheet('plant')">+ Add</button>
+        </div>
+        <div id="plants-list"></div>
+      </div>
+
+      <div id="sub-harvests" style="display:none">
+        <div class="section-title">
+          <h2>Harvest Records</h2>
+          <button class="btn btn-primary btn-sm" onclick="openSheet('harvest')">+ Harvest</button>
+        </div>
+        <div id="harvests-list"></div>
+      </div>
+
+      <div id="sub-sales" style="display:none">
+        <div class="section-title">
+          <h2>Sales Records</h2>
+          <button class="btn btn-primary btn-sm" onclick="openSheet('sale')">+ Sale</button>
+        </div>
+        <div id="sales-list"></div>
+      </div>
+
+      <div id="sub-feeding" style="display:none">
+        <div class="section-title">
+          <h2>Feeding Programme</h2>
+          <button class="btn btn-primary btn-sm" onclick="openSheet('feeding')">+ Record</button>
+        </div>
+        <div id="feeding-list"></div>
+      </div>
+
+      <div id="sub-photos" style="display:none">
+        <div class="section-title">
+          <h2>Photo Notes</h2>
+          <button class="btn btn-primary btn-sm" onclick="openSheet('photo')">+ Photo</button>
+        </div>
+        <div id="photos-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <button class="fab" id="fab" onclick="fabAction()">+</button>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-view="dashboard">
+      <span class="nav-icon">🏠</span> Home
+    </button>
+    <button class="nav-item" data-view="blocks">
+      <span class="nav-icon">🪴</span> Blocks
+    </button>
+    <button class="nav-item" data-view="activities">
+      <span class="nav-icon">📋</span> Tasks
+    </button>
+    <button class="nav-item" data-view="produce">
+      <span class="nav-icon">🥬</span> Produce
+    </button>
+  </nav>
+
+  <!-- Sheet -->
+  <div class="sheet-overlay" id="sheet-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="sheet-title">Title</h3>
+        <button class="sheet-close" onclick="closeSheet()">×</button>
+      </div>
+      <div class="sheet-body" id="sheet-body"></div>
+      <div class="sheet-footer" id="sheet-footer"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightbox-img" src="" alt="Full size">
+  </div>
+
+  <div class="report-overlay" id="report-overlay">
+    <div class="report-panel">
+      <div class="report-toolbar">
+        <h3>Garden Report</h3>
+        <button class="btn btn-secondary btn-sm" onclick="printReport()">🖨️ Print</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadReport()">⬇️ Download</button>
+        <button class="btn btn-secondary btn-sm" onclick="closeReport()">Close</button>
+      </div>
+      <div class="report-body" id="report-body"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'schoolGardenMobile_v4';
+    const defaultData = {
+      blocks: [
+        { id: 'b1', name: 'Block A – Cabbage Bed', location: 'Main field, near classroom', size: '8m × 4m', status: 'active', notes: 'Mulched with dry grass. Good sun exposure.', createdAt: '2025-09-15' },
+        { id: 'b2', name: 'Block B – Mixed Vegetables', location: 'East side of garden', size: '6m × 3m', status: 'active', notes: '', createdAt: '2025-09-20' },
+        { id: 'b3', name: 'Block C – Fallow', location: 'Behind main path', size: '5m × 3m', status: 'fallow', notes: 'Resting this season for soil recovery.', createdAt: '2025-08-01' }
+      ],
+      plantings: [
+        { id: 'p1', blockId: 'b1', crop: 'Cabbage (White)', variety: 'Golden Acre', quantity: 45, plantedDate: '2025-09-18', expectedHarvest: '2025-12-10', stage: 'Heading', status: 'growing', notes: 'Strong growth after mulching.' },
+        { id: 'p2', blockId: 'b1', crop: 'Cabbage (Red)', variety: 'Ruby Ball', quantity: 12, plantedDate: '2025-09-25', expectedHarvest: '2025-12-20', stage: 'Vegetative', status: 'growing', notes: '' },
+        { id: 'p3', blockId: 'b2', crop: 'Swiss Chard', variety: 'Bright Lights', quantity: 20, plantedDate: '2025-10-05', expectedHarvest: '2025-11-25', stage: 'Vegetative', status: 'growing', notes: '' }
+      ],
+      activities: [
+        { id: 'a1', type: 'watering', blockId: 'b1', date: '2025-11-07', performedBy: 'Class 6A', notes: 'Morning watering after dry spell.', photo: null, createdAt: new Date().toISOString() },
+        { id: 'a2', type: 'weeding', blockId: 'b1', date: '2025-11-05', performedBy: 'Garden Club', notes: 'Removed grass and weeds. Replaced some mulch.', photo: null, createdAt: new Date().toISOString() },
+        { id: 'a3', type: 'planting', blockId: 'b1', date: '2025-09-18', performedBy: 'Mrs. Okello + Class 5', notes: 'Transplanted 45 Golden Acre cabbage seedlings.', photo: null, createdAt: new Date().toISOString() },
+        { id: 'a4', type: 'other', blockId: 'b1', date: '2025-10-12', performedBy: 'Garden Club', notes: 'Applied dry grass mulch across the whole block.', photo: null, createdAt: new Date().toISOString() }
+      ],
+      harvests: [
+        { id: 'h1', date: '2025-11-02', blockId: 'b1', plantingId: 'p1', crop: 'Cabbage (White)', quantity: 20, unit: 'heads', quality: 'Good', harvestedBy: 'Garden Club', notes: 'First major harvest. Firm heads, good size.', photo: null, createdAt: new Date().toISOString() },
+        { id: 'h2', date: '2025-10-28', blockId: 'b2', plantingId: 'p3', crop: 'Swiss Chard', quantity: 15, unit: 'bunches', quality: 'Good', harvestedBy: 'Class 6A', notes: 'Leafy and healthy.', photo: null, createdAt: new Date().toISOString() }
+      ],
+      sales: [
+        { id: 's1', date: '2025-11-02', crop: 'Cabbage (White)', quantity: 8, unit: 'heads', unitPrice: 50, total: 400, buyer: 'Staff members', harvestId: 'h1', notes: 'Sold after school.', createdAt: new Date().toISOString() },
+        { id: 's2', date: '2025-10-28', crop: 'Swiss Chard', quantity: 5, unit: 'bunches', unitPrice: 30, total: 150, buyer: 'Local market', harvestId: 'h2', notes: '', createdAt: new Date().toISOString() }
+      ],
+      feeding: [
+        { id: 'f1', date: '2025-11-05', crop: 'Cabbage (White)', quantity: 12, unit: 'heads', mealsServed: 85, harvestId: 'h1', notes: 'Used in school lunch – cabbage stew.', createdAt: new Date().toISOString() },
+        { id: 'f2', date: '2025-10-30', crop: 'Swiss Chard', quantity: 8, unit: 'bunches', mealsServed: 70, harvestId: 'h2', notes: 'Added to vegetable rice.', createdAt: new Date().toISOString() }
+      ],
+      photos: []
+    };
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return structuredClone(defaultData);
+    }
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        if (e.name === 'QuotaExceededError') {
+          alert('Storage full. Please delete some old photo notes to free space.');
+        }
+      }
+    }
+
+    let data = loadData();
+    if (!data.harvests) data.harvests = [];
+    let currentFilter = 'all';
+    let editingId = null;
+    let deferredPrompt = null;
+    let currentProduceSub = 'crops';
+    let pendingPhoto = null; // base64 for form
+
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    function formatDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function formatMoney(n) { return 'KSh ' + (Number(n) || 0).toLocaleString(); }
+    function getBlock(id) { return data.blocks.find(b => b.id === id); }
+    function plantingsFor(blockId) { return data.plantings.filter(p => p.blockId === blockId); }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ========== IMAGE COMPRESSION ==========
+    function compressImage(file, maxWidth = 800, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) {
+          reject(new Error('Not an image'));
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxWidth) {
+              h = Math.round(h * maxWidth / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setupPhotoPicker(inputId, previewId) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      if (!input) return;
+      input.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          showToast('Compressing photo...');
+          pendingPhoto = await compressImage(file);
+          if (preview) {
+            preview.src = pendingPhoto;
+            preview.classList.add('show');
+            preview.closest('.photo-picker')?.classList.add('has-image');
+          }
+          showToast('Photo ready');
+        } catch (err) {
+          showToast('Could not load photo');
+          pendingPhoto = null;
+        }
+      });
+    }
+
+    function clearPendingPhoto() {
+      pendingPhoto = null;
+      const preview = document.getElementById('photo-preview');
+      if (preview) {
+        preview.src = '';
+        preview.classList.remove('show');
+        preview.closest('.photo-picker')?.classList.remove('has-image');
+      }
+      const input = document.getElementById('photo-input');
+      if (input) input.value = '';
+    }
+
+    function openLightbox(src) {
+      if (!src) return;
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+
+    // ========== RENDER ==========
+    function renderStats() {
+      const active = data.blocks.filter(b => b.status === 'active').length;
+      const growing = data.plantings.filter(p => p.status === 'growing').length;
+      const totalSales = data.sales.reduce((s, x) => s + (x.total || 0), 0);
+      const totalMeals = data.feeding.reduce((s, x) => s + (x.mealsServed || 0), 0);
+      const harvestCount = (data.harvests || []).length;
+      const harvestQty = (data.harvests || []).reduce((s, h) => s + (h.quantity || 0), 0);
+      document.getElementById('stats-row').innerHTML = `
+        <div class="stat-card"><div class="label">Active Blocks</div><div class="value">${active}</div></div>
+        <div class="stat-card"><div class="label">Growing Crops</div><div class="value">${growing}</div></div>
+        <div class="stat-card"><div class="label">Harvests</div><div class="value">${harvestCount}</div><div class="sub">${harvestQty} units total</div></div>
+        <div class="stat-card"><div class="label">Sales · Meals</div><div class="value" style="font-size:1.15rem">${formatMoney(totalSales)}</div><div class="sub">${totalMeals} meals served</div></div>
+      `;
+    }
+
+    function renderBlocks() {
+      const el = document.getElementById('blocks-list');
+      if (!data.blocks.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">🪴</div><p>No blocks yet.</p></div>`;
+        return;
+      }
+      el.innerHTML = data.blocks.map(b => {
+        const plants = plantingsFor(b.id);
+        const badgeClass = { active: 'badge-active', fallow: 'badge-fallow', harvest: 'badge-harvest' }[b.status] || 'badge-active';
+        return `
+          <div class="block-card">
+            <div class="block-header">
+              <div>
+                <h3>${b.name}</h3>
+                ${b.location ? `<div class="block-loc">${b.location}</div>` : ''}
+              </div>
+              <span class="badge ${badgeClass}">${b.status}</span>
+            </div>
+            <div class="block-body">
+              <div class="meta-row">
+                <span>📐 ${b.size || '—'}</span>
+                <span>🌱 ${plants.length} crop${plants.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div>
+                ${plants.length ? plants.map(p => `<span class="crop-chip">${p.crop} <small>×${p.quantity}</small></span>`).join('') : '<span style="font-size:0.85rem;color:#9ca3af">No plantings yet</span>'}
+              </div>
+              ${b.notes ? `<p style="font-size:0.8rem;color:#6b7280;margin-top:0.6rem">${b.notes}</p>` : ''}
+              <div class="block-actions">
+                <button class="btn btn-secondary btn-sm" onclick="openSheet('plant','${b.id}')">+ Plant</button>
+                <button class="btn btn-secondary btn-sm" onclick="openSheet('activity','${b.id}')">Log Task</button>
+                <button class="btn btn-secondary btn-sm" onclick="editBlock('${b.id}')">Edit</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderActivities(targetId, limit = null) {
+      let acts = [...data.activities].sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (currentFilter !== 'all' && targetId === 'all-activities') acts = acts.filter(a => a.type === currentFilter);
+      if (limit) acts = acts.slice(0, limit);
+      const el = document.getElementById(targetId);
+      if (!acts.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">📋</div><p>No activities yet.</p></div>`;
+        return;
+      }
+      const icons = { watering: '💧', weeding: '🌿', planting: '🌱', harvest: '🧺', other: '📝' };
+      el.innerHTML = acts.map(a => {
+        const block = getBlock(a.blockId);
+        return `
+          <div class="activity-item">
+            <div class="act-icon">${icons[a.type] || '📝'}</div>
+            <div class="act-body">
+              <div class="act-title">${a.type.charAt(0).toUpperCase() + a.type.slice(1)}</div>
+              <div class="act-meta">${block ? block.name : '—'} · ${formatDate(a.date)}${a.performedBy ? ' · ' + a.performedBy : ''}</div>
+              ${a.notes ? `<div class="act-notes">${a.notes}</div>` : ''}
+              ${a.photo ? `<div class="act-photo"><img src="${a.photo}" alt="Activity photo" onclick="openLightbox(this.src)"></div>` : ''}
+            </div>
+            <button class="btn btn-danger btn-sm" style="padding:0.3rem 0.5rem" onclick="deleteActivity('${a.id}')">✕</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPlants() {
+      const el = document.getElementById('plants-list');
+      if (!data.plantings.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">🥬</div><p>No plantings recorded.</p></div>`;
+        return;
+      }
+      el.innerHTML = data.plantings.map(p => {
+        const block = getBlock(p.blockId);
+        return `
+          <div class="plant-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <h4>${p.crop}</h4>
+                ${p.variety ? `<div class="variety">${p.variety}</div>` : ''}
+              </div>
+              <span class="badge badge-active">${p.stage || p.status}</span>
+            </div>
+            <div class="plant-details">
+              <div><span>Block</span><br><strong>${block ? block.name : '—'}</strong></div>
+              <div><span>Quantity</span><br><strong>${p.quantity} plants</strong></div>
+              <div><span>Planted</span><br><strong>${formatDate(p.plantedDate)}</strong></div>
+              <div><span>Est. Harvest</span><br><strong>${formatDate(p.expectedHarvest)}</strong></div>
+            </div>
+            <div style="margin-top:0.75rem">
+              <button class="btn btn-secondary btn-sm" onclick="editPlanting('${p.id}')">Edit</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderHarvests() {
+      const el = document.getElementById('harvests-list');
+      if (!data.harvests) data.harvests = [];
+      const list = [...data.harvests].sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">🧺</div><p>No harvests recorded yet. Log your first harvest!</p></div>`;
+        return;
+      }
+      el.innerHTML = list.map(h => {
+        const block = getBlock(h.blockId);
+        const sold = data.sales.filter(s => s.harvestId === h.id).reduce((s, x) => s + (x.quantity || 0), 0);
+        const fed = data.feeding.filter(f => f.harvestId === h.id).reduce((s, x) => s + (x.quantity || 0), 0);
+        return `
+          <div class="record-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <h4>${h.crop}</h4>
+                <div class="variety">${formatDate(h.date)}${block ? ' · ' + block.name : ''}</div>
+              </div>
+              <span class="badge badge-harvest">${h.quality || 'Harvest'}</span>
+            </div>
+            <div class="record-details">
+              <div><span>Quantity</span><br><strong>${h.quantity} ${h.unit || ''}</strong></div>
+              <div><span>Harvested by</span><br><strong>${h.harvestedBy || '—'}</strong></div>
+              <div><span>Sold from this</span><br><strong>${sold} ${h.unit || ''}</strong></div>
+              <div><span>Used for feeding</span><br><strong>${fed} ${h.unit || ''}</strong></div>
+            </div>
+            ${h.notes ? `<p style="font-size:0.82rem;color:#6b7280;margin-top:0.6rem">${h.notes}</p>` : ''}
+            ${h.photo ? `<div class="act-photo" style="margin-top:0.5rem"><img src="${h.photo}" alt="Harvest" onclick="openLightbox(this.src)"></div>` : ''}
+            <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="openSheet('sale',null,'${h.id}')">+ Sale</button>
+              <button class="btn btn-secondary btn-sm" onclick="openSheet('feeding',null,'${h.id}')">+ Feeding</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteHarvest('${h.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSales() {
+      const el = document.getElementById('sales-list');
+      const list = [...data.sales].sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">💰</div><p>No sales recorded yet.</p></div>`;
+        return;
+      }
+      el.innerHTML = list.map(s => `
+        <div class="record-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h4>${s.crop}</h4>
+              <div class="variety">${formatDate(s.date)}${s.buyer ? ' · ' + s.buyer : ''}</div>
+            </div>
+            <span class="badge badge-sale">Sale</span>
+          </div>
+          <div class="record-details">
+            <div><span>Quantity</span><br><strong>${s.quantity} ${s.unit || ''}</strong></div>
+            <div><span>Unit Price</span><br><strong>${formatMoney(s.unitPrice)}</strong></div>
+            <div><span>Total</span><br><strong class="amount money">${formatMoney(s.total)}</strong></div>
+            <div><span>Buyer</span><br><strong>${s.buyer || '—'}</strong></div>
+          </div>
+          ${s.notes ? `<p style="font-size:0.82rem;color:#6b7280;margin-top:0.6rem">${s.notes}</p>` : ''}
+          <div style="margin-top:0.7rem">
+            <button class="btn btn-danger btn-sm" onclick="deleteSale('${s.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderFeeding() {
+      const el = document.getElementById('feeding-list');
+      const list = [...data.feeding].sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">🍽️</div><p>No feeding programme records yet.</p></div>`;
+        return;
+      }
+      el.innerHTML = list.map(f => `
+        <div class="record-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h4>${f.crop}</h4>
+              <div class="variety">${formatDate(f.date)}</div>
+            </div>
+            <span class="badge badge-feed">Feeding</span>
+          </div>
+          <div class="record-details">
+            <div><span>Quantity Used</span><br><strong>${f.quantity} ${f.unit || ''}</strong></div>
+            <div><span>Meals Served</span><br><strong class="amount">${f.mealsServed || 0}</strong></div>
+          </div>
+          ${f.notes ? `<p style="font-size:0.82rem;color:#6b7280;margin-top:0.6rem">${f.notes}</p>` : ''}
+          <div style="margin-top:0.7rem">
+            <button class="btn btn-danger btn-sm" onclick="deleteFeeding('${f.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderPhotos() {
+      const el = document.getElementById('photos-list');
+      // Combine standalone photo notes + activity photos
+      const fromNotes = data.photos.map(p => ({
+        id: p.id,
+        src: p.photo,
+        title: p.title || 'Photo note',
+        date: p.date,
+        notes: p.notes,
+        blockId: p.blockId,
+        source: 'note'
+      }));
+      const fromActs = data.activities.filter(a => a.photo).map(a => ({
+        id: a.id,
+        src: a.photo,
+        title: a.type.charAt(0).toUpperCase() + a.type.slice(1),
+        date: a.date,
+        notes: a.notes,
+        blockId: a.blockId,
+        source: 'activity'
+      }));
+      const all = [...fromNotes, ...fromActs].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      if (!all.length) {
+        el.innerHTML = `<div class="empty"><div class="emoji">📷</div><p>No photo notes yet. Tap + Photo to capture growth progress.</p></div>`;
+        return;
+      }
+
+      el.innerHTML = `<div class="photo-grid">${all.map(p => {
+        const block = getBlock(p.blockId);
+        return `
+          <div class="photo-card">
+            <img src="${p.src}" alt="${p.title}" onclick="openLightbox(this.src)">
+            <div class="photo-info">
+              <strong>${p.title}</strong>
+              <div class="photo-meta">${formatDate(p.date)}${block ? ' · ' + block.name : ''}</div>
+              ${p.notes ? `<div style="margin-top:0.25rem;color:#4b5563">${p.notes.slice(0,60)}${p.notes.length > 60 ? '…' : ''}</div>` : ''}
+              ${p.source === 'note' ? `<button class="btn btn-danger btn-sm" style="margin-top:0.4rem" onclick="deletePhoto('${p.id}')">Delete</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('')}</div>`;
+    }
+
+    function renderAll() {
+      if (!data.harvests) data.harvests = [];
+      renderStats();
+      renderBlocks();
+      renderActivities('recent-activities', 4);
+      renderActivities('all-activities');
+      renderPlants();
+      renderHarvests();
+      renderSales();
+      renderFeeding();
+      renderPhotos();
+    }
+
+    function switchView(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('view-' + view).classList.add('active');
+      document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
+
+    document.getElementById('produce-tabs').addEventListener('click', e => {
+      if (!e.target.classList.contains('sub-tab')) return;
+      document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      currentProduceSub = e.target.dataset.sub;
+      ['crops', 'harvests', 'sales', 'feeding', 'photos'].forEach(s => {
+        const el = document.getElementById('sub-' + s);
+        if (el) el.style.display = currentProduceSub === s ? 'block' : 'none';
+      });
+    });
+
+    function fabAction() {
+      const active = document.querySelector('.nav-item.active')?.dataset.view;
+      if (active === 'blocks') openSheet('block');
+      else if (active === 'produce') {
+        if (currentProduceSub === 'harvests') openSheet('harvest');
+        else if (currentProduceSub === 'sales') openSheet('sale');
+        else if (currentProduceSub === 'feeding') openSheet('feeding');
+        else if (currentProduceSub === 'photos') openSheet('photo');
+        else openSheet('plant');
+      }
+      else openSheet('activity');
+    }
+
+    document.getElementById('activity-filters').addEventListener('click', e => {
+      if (!e.target.classList.contains('chip')) return;
+      document.querySelectorAll('#activity-filters .chip').forEach(c => c.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderActivities('all-activities');
+    });
+
+    // ========== SHEETS ==========
+    function openSheet(type, blockId = null, harvestId = null) {
+      editingId = null;
+      pendingPhoto = null;
+      const overlay = document.getElementById('sheet-overlay');
+      const title = document.getElementById('sheet-title');
+      const body = document.getElementById('sheet-body');
+      const footer = document.getElementById('sheet-footer');
+      const today = new Date().toISOString().slice(0,10);
+
+      const photoField = `
+        <div class="form-group">
+          <label>Photo (optional)</label>
+          <div class="photo-picker" id="photo-picker-box">
+            <p class="photo-hint">📷 Take or choose a photo</p>
+            <img class="photo-preview" id="photo-preview" alt="Preview">
+            <div class="photo-actions">
+              <label class="btn btn-secondary btn-sm" for="photo-input">Camera / Gallery</label>
+              <button type="button" class="btn btn-danger btn-sm" onclick="clearPendingPhoto()">Remove</button>
+            </div>
+            <input type="file" id="photo-input" class="hidden-file" accept="image/*" capture="environment">
+          </div>
+        </div>
+      `;
+
+      if (type === 'block') {
+        title.textContent = 'New Garden Block';
+        body.innerHTML = `
+          <div class="form-group"><label>Block Name *</label><input type="text" id="f-name" placeholder="e.g. Block A – Cabbage Bed"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f-location" placeholder="e.g. Near classroom"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Size</label><input type="text" id="f-size" placeholder="8m × 4m"></div>
+            <div class="form-group"><label>Status</label>
+              <select id="f-status"><option value="active">Active</option><option value="fallow">Fallow</option><option value="harvest">Harvest ready</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="3"></textarea></div>
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="saveBlock()">Save</button>`;
+      }
+
+      if (type === 'plant') {
+        title.textContent = 'Add Planting';
+        const opts = data.blocks.map(b => `<option value="${b.id}" ${blockId === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
+        body.innerHTML = `
+          <div class="form-group"><label>Block *</label><select id="f-block">${opts}</select></div>
+          <div class="form-group"><label>Crop *</label>
+            <input type="text" id="f-crop" list="crops" placeholder="Cabbage, Kale...">
+            <datalist id="crops"><option value="Cabbage (White)"><option value="Cabbage (Red)"><option value="Kale"><option value="Swiss Chard"><option value="Spinach"><option value="Tomato"><option value="Onion"><option value="Carrot"><option value="Beans"><option value="Maize"></datalist>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Variety</label><input type="text" id="f-variety"></div>
+            <div class="form-group"><label>Quantity</label><input type="number" id="f-qty" min="1" value="20"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Planted Date</label><input type="date" id="f-planted" value="${today}"></div>
+            <div class="form-group"><label>Expected Harvest</label><input type="date" id="f-harvest"></div>
+          </div>
+          <div class="form-group"><label>Growth Stage</label>
+            <select id="f-stage"><option>Seedling</option><option>Vegetative</option><option selected>Heading</option><option>Flowering</option><option>Mature</option></select>
+          </div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2"></textarea></div>
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="savePlanting()">Save</button>`;
+      }
+
+      if (type === 'activity') {
+        title.textContent = 'Log Activity';
+        const opts = data.blocks.map(b => `<option value="${b.id}" ${blockId === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
+        body.innerHTML = `
+          <div class="form-group"><label>Activity Type</label>
+            <select id="f-type">
+              <option value="watering">💧 Watering</option>
+              <option value="weeding">🌿 Weeding</option>
+              <option value="planting">🌱 Planting</option>
+              <option value="harvest">🧺 Harvest</option>
+              <option value="other">📝 Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Block</label><select id="f-block">${opts}</select></div>
+          <div class="form-row">
+            <div class="form-group"><label>Date</label><input type="date" id="f-date" value="${today}"></div>
+            <div class="form-group"><label>Done by</label><input type="text" id="f-by" placeholder="Class 6A / Garden Club"></div>
+          </div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2"></textarea></div>
+          ${photoField}
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="saveActivity()">Save</button>`;
+        setTimeout(() => setupPhotoPicker('photo-input', 'photo-preview'), 50);
+      }
+
+      if (type === 'photo') {
+        title.textContent = 'Photo Note';
+        const opts = data.blocks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        body.innerHTML = `
+          <div class="form-group"><label>Title</label><input type="text" id="f-title" placeholder="e.g. Cabbage heads forming"></div>
+          <div class="form-group"><label>Block (optional)</label>
+            <select id="f-block"><option value="">— None —</option>${opts}</select>
+          </div>
+          <div class="form-group"><label>Date</label><input type="date" id="f-date" value="${today}"></div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2" placeholder="What do you see? Growth stage, pests, etc."></textarea></div>
+          ${photoField}
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="savePhotoNote()">Save Photo</button>`;
+        setTimeout(() => setupPhotoPicker('photo-input', 'photo-preview'), 50);
+      }
+
+      if (type === 'harvest') {
+        title.textContent = 'Log Harvest';
+        const blockOpts = data.blocks.map(b => `<option value="${b.id}" ${blockId === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
+        const plantingOpts = data.plantings.map(p => {
+          const bl = getBlock(p.blockId);
+          return `<option value="${p.id}">${p.crop}${p.variety ? ' (' + p.variety + ')' : ''} – ${bl ? bl.name : ''}</option>`;
+        }).join('');
+        body.innerHTML = `
+          <div class="form-group"><label>Crop *</label>
+            <input type="text" id="f-crop" list="crops" placeholder="Cabbage (White)">
+            <datalist id="crops"><option value="Cabbage (White)"><option value="Cabbage (Red)"><option value="Swiss Chard"><option value="Kale"><option value="Spinach"><option value="Tomato"><option value="Onion"><option value="Carrot"><option value="Beans"></datalist>
+          </div>
+          <div class="form-group"><label>Block</label><select id="f-block">${blockOpts}</select></div>
+          <div class="form-group"><label>Link to planting (optional)</label>
+            <select id="f-planting"><option value="">— None —</option>${plantingOpts}</select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Quantity *</label><input type="number" id="f-qty" min="0.1" step="0.1" value="10"></div>
+            <div class="form-group"><label>Unit</label>
+              <select id="f-unit"><option>heads</option><option>bunches</option><option>kg</option><option>pieces</option><option>bags</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Quality</label>
+              <select id="f-quality"><option>Excellent</option><option selected>Good</option><option>Fair</option><option>Poor</option></select>
+            </div>
+            <div class="form-group"><label>Date</label><input type="date" id="f-date" value="${today}"></div>
+          </div>
+          <div class="form-group"><label>Harvested by</label><input type="text" id="f-by" placeholder="Garden Club / Class 6A"></div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2" placeholder="Size, condition, weather..."></textarea></div>
+          ${photoField}
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="saveHarvest()">Save Harvest</button>`;
+        setTimeout(() => setupPhotoPicker('photo-input', 'photo-preview'), 50);
+      }
+
+      if (type === 'sale') {
+        title.textContent = 'Record Sale';
+        const harvestOpts = (data.harvests || []).map(h =>
+          `<option value="${h.id}" ${harvestId === h.id ? 'selected' : ''}>${h.crop} – ${formatDate(h.date)} (${h.quantity} ${h.unit})</option>`
+        ).join('');
+        const preCrop = harvestId ? (data.harvests.find(h => h.id === harvestId)?.crop || '') : '';
+        body.innerHTML = `
+          <div class="form-group"><label>From harvest (optional)</label>
+            <select id="f-harvest"><option value="">— Direct / not linked —</option>${harvestOpts}</select>
+          </div>
+          <div class="form-group"><label>Crop / Produce *</label>
+            <input type="text" id="f-crop" list="crops" placeholder="Cabbage (White)" value="${preCrop}">
+            <datalist id="crops"><option value="Cabbage (White)"><option value="Cabbage (Red)"><option value="Swiss Chard"><option value="Kale"><option value="Spinach"><option value="Tomato"><option value="Onion"></datalist>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Quantity *</label><input type="number" id="f-qty" min="0.1" step="0.1" value="5"></div>
+            <div class="form-group"><label>Unit</label>
+              <select id="f-unit"><option>heads</option><option>bunches</option><option>kg</option><option>pieces</option><option>bags</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Unit Price (KSh)</label><input type="number" id="f-price" min="0" value="50"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="f-date" value="${today}"></div>
+          </div>
+          <div class="form-group"><label>Buyer</label><input type="text" id="f-buyer" placeholder="Staff, market, parent..."></div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2"></textarea></div>
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="saveSale()">Save Sale</button>`;
+      }
+
+      if (type === 'feeding') {
+        title.textContent = 'Feeding Programme Record';
+        const harvestOpts = (data.harvests || []).map(h =>
+          `<option value="${h.id}" ${harvestId === h.id ? 'selected' : ''}>${h.crop} – ${formatDate(h.date)} (${h.quantity} ${h.unit})</option>`
+        ).join('');
+        const preCrop = harvestId ? (data.harvests.find(h => h.id === harvestId)?.crop || '') : '';
+        body.innerHTML = `
+          <div class="form-group"><label>From harvest (optional)</label>
+            <select id="f-harvest"><option value="">— Direct / not linked —</option>${harvestOpts}</select>
+          </div>
+          <div class="form-group"><label>Crop / Produce Used *</label>
+            <input type="text" id="f-crop" list="crops" placeholder="Cabbage (White)" value="${preCrop}">
+            <datalist id="crops"><option value="Cabbage (White)"><option value="Cabbage (Red)"><option value="Swiss Chard"><option value="Kale"><option value="Spinach"><option value="Tomato"><option value="Onion"></datalist>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Quantity Used *</label><input type="number" id="f-qty" min="0.1" step="0.1" value="10"></div>
+            <div class="form-group"><label>Unit</label>
+              <select id="f-unit"><option>heads</option><option>bunches</option><option>kg</option><option>pieces</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Meals Served</label><input type="number" id="f-meals" min="0" value="80"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="f-date" value="${today}"></div>
+          </div>
+          <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="3" placeholder="e.g. Used in cabbage stew for lunch"></textarea></div>
+        `;
+        footer.innerHTML = `<button class="btn btn-secondary" onclick="closeSheet()">Cancel</button><button class="btn btn-primary" onclick="saveFeeding()">Save Record</button>`;
+      }
+
+      overlay.classList.add('open');
+    }
+
+    function closeSheet() {
+      document.getElementById('sheet-overlay').classList.remove('open');
+      editingId = null;
+      pendingPhoto = null;
+    }
+
+    document.getElementById('sheet-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeSheet();
+    });
+
+    // ========== SAVE ==========
+    function saveBlock() {
+      const name = document.getElementById('f-name').value.trim();
+      if (!name) return alert('Please enter a block name');
+      const block = {
+        id: editingId || uid(),
+        name,
+        location: document.getElementById('f-location').value.trim(),
+        size: document.getElementById('f-size').value.trim(),
+        status: document.getElementById('f-status').value,
+        notes: document.getElementById('f-notes').value.trim(),
+        createdAt: editingId ? getBlock(editingId).createdAt : new Date().toISOString().slice(0,10)
+      };
+      if (editingId) {
+        const i = data.blocks.findIndex(b => b.id === editingId);
+        data.blocks[i] = block;
+      } else data.blocks.push(block);
+      saveData(); closeSheet(); renderAll();
+      showToast(editingId ? 'Block updated' : 'Block created');
+    }
+
+    function savePlanting() {
+      const crop = document.getElementById('f-crop').value.trim();
+      if (!crop) return alert('Please enter a crop name');
+      const planting = {
+        id: editingId || uid(),
+        blockId: document.getElementById('f-block').value,
+        crop,
+        variety: document.getElementById('f-variety').value.trim(),
+        quantity: parseInt(document.getElementById('f-qty').value) || 0,
+        plantedDate: document.getElementById('f-planted').value,
+        expectedHarvest: document.getElementById('f-harvest').value,
+        stage: document.getElementById('f-stage').value,
+        status: 'growing',
+        notes: document.getElementById('f-notes').value.trim()
+      };
+      if (editingId) {
+        const i = data.plantings.findIndex(p => p.id === editingId);
+        data.plantings[i] = { ...data.plantings[i], ...planting };
+      } else data.plantings.push(planting);
+      saveData(); closeSheet(); renderAll();
+      showToast(editingId ? 'Planting updated' : 'Planting added');
+    }
+
+    function saveActivity() {
+      data.activities.unshift({
+        id: uid(),
+        type: document.getElementById('f-type').value,
+        blockId: document.getElementById('f-block').value,
+        date: document.getElementById('f-date').value,
+        performedBy: document.getElementById('f-by').value.trim(),
+        notes: document.getElementById('f-notes').value.trim(),
+        photo: pendingPhoto || null,
+        createdAt: new Date().toISOString()
+      });
+      saveData(); closeSheet(); renderAll();
+      showToast('Activity logged' + (pendingPhoto ? ' with photo' : ''));
+    }
+
+    function savePhotoNote() {
+      if (!pendingPhoto) return alert('Please take or choose a photo');
+      data.photos.unshift({
+        id: uid(),
+        title: document.getElementById('f-title').value.trim() || 'Photo note',
+        blockId: document.getElementById('f-block').value || null,
+        date: document.getElementById('f-date').value,
+        notes: document.getElementById('f-notes').value.trim(),
+        photo: pendingPhoto,
+        createdAt: new Date().toISOString()
+      });
+      saveData(); closeSheet(); renderAll();
+      showToast('Photo note saved');
+    }
+
+    function saveHarvest() {
+      const crop = document.getElementById('f-crop').value.trim();
+      const qty = parseFloat(document.getElementById('f-qty').value) || 0;
+      if (!crop || qty <= 0) return alert('Enter crop and quantity');
+      if (!data.harvests) data.harvests = [];
+      data.harvests.unshift({
+        id: uid(),
+        date: document.getElementById('f-date').value,
+        blockId: document.getElementById('f-block').value,
+        plantingId: document.getElementById('f-planting').value || null,
+        crop,
+        quantity: qty,
+        unit: document.getElementById('f-unit').value,
+        quality: document.getElementById('f-quality').value,
+        harvestedBy: document.getElementById('f-by').value.trim(),
+        notes: document.getElementById('f-notes').value.trim(),
+        photo: pendingPhoto || null,
+        createdAt: new Date().toISOString()
+      });
+      // Optionally update planting stage
+      const plantingId = document.getElementById('f-planting').value;
+      if (plantingId) {
+        const p = data.plantings.find(x => x.id === plantingId);
+        if (p && p.stage !== 'Mature') p.stage = 'Mature';
+      }
+      saveData(); closeSheet(); renderAll();
+      showToast('Harvest logged' + (pendingPhoto ? ' with photo' : ''));
+    }
+
+    function saveSale() {
+      const crop = document.getElementById('f-crop').value.trim();
+      const qty = parseFloat(document.getElementById('f-qty').value) || 0;
+      const price = parseFloat(document.getElementById('f-price').value) || 0;
+      if (!crop || qty <= 0) return alert('Enter crop and quantity');
+      data.sales.unshift({
+        id: uid(),
+        date: document.getElementById('f-date').value,
+        crop,
+        quantity: qty,
+        unit: document.getElementById('f-unit').value,
+        unitPrice: price,
+        total: Math.round(qty * price),
+        buyer: document.getElementById('f-buyer').value.trim(),
+        harvestId: document.getElementById('f-harvest')?.value || null,
+        notes: document.getElementById('f-notes').value.trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveData(); closeSheet(); renderAll();
+      showToast('Sale recorded');
+    }
+
+    function saveFeeding() {
+      const crop = document.getElementById('f-crop').value.trim();
+      const qty = parseFloat(document.getElementById('f-qty').value) || 0;
+      if (!crop || qty <= 0) return alert('Enter crop and quantity used');
+      data.feeding.unshift({
+        id: uid(),
+        date: document.getElementById('f-date').value,
+        crop,
+        quantity: qty,
+        unit: document.getElementById('f-unit').value,
+        mealsServed: parseInt(document.getElementById('f-meals').value) || 0,
+        harvestId: document.getElementById('f-harvest')?.value || null,
+        notes: document.getElementById('f-notes').value.trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveData(); closeSheet(); renderAll();
+      showToast('Feeding record saved');
+    }
+
+    function editBlock(id) {
+      const b = getBlock(id);
+      if (!b) return;
+      editingId = id;
+      openSheet('block');
+      setTimeout(() => {
+        document.getElementById('f-name').value = b.name;
+        document.getElementById('f-location').value = b.location || '';
+        document.getElementById('f-size').value = b.size || '';
+        document.getElementById('f-status').value = b.status;
+        document.getElementById('f-notes').value = b.notes || '';
+        document.getElementById('sheet-title').textContent = 'Edit Block';
+      }, 20);
+    }
+
+    function editPlanting(id) {
+      const p = data.plantings.find(x => x.id === id);
+      if (!p) return;
+      editingId = id;
+      openSheet('plant', p.blockId);
+      setTimeout(() => {
+        document.getElementById('f-crop').value = p.crop;
+        document.getElementById('f-variety').value = p.variety || '';
+        document.getElementById('f-qty').value = p.quantity;
+        document.getElementById('f-planted').value = p.plantedDate || '';
+        document.getElementById('f-harvest').value = p.expectedHarvest || '';
+        document.getElementById('f-stage').value = p.stage || 'Vegetative';
+        document.getElementById('f-notes').value = p.notes || '';
+        document.getElementById('sheet-title').textContent = 'Edit Planting';
+      }, 20);
+    }
+
+    function deleteActivity(id) {
+      if (!confirm('Delete this activity?')) return;
+      data.activities = data.activities.filter(a => a.id !== id);
+      saveData(); renderAll(); showToast('Deleted');
+    }
+    function deleteHarvest(id) {
+      if (!confirm('Delete this harvest record?')) return;
+      data.harvests = (data.harvests || []).filter(h => h.id !== id);
+      saveData(); renderAll(); showToast('Harvest deleted');
+    }
+    function deleteSale(id) {
+      if (!confirm('Delete this sale record?')) return;
+      data.sales = data.sales.filter(s => s.id !== id);
+      saveData(); renderAll(); showToast('Sale deleted');
+    }
+    function deleteFeeding(id) {
+      if (!confirm('Delete this feeding record?')) return;
+      data.feeding = data.feeding.filter(f => f.id !== id);
+      saveData(); renderAll(); showToast('Record deleted');
+    }
+    function deletePhoto(id) {
+      if (!confirm('Delete this photo note?')) return;
+      data.photos = data.photos.filter(p => p.id !== id);
+      saveData(); renderAll(); showToast('Photo deleted');
+    }
+
+    // ========== REPORT ==========
+    function buildReportHTML() {
+      if (!data.harvests) data.harvests = [];
+      const now = new Date();
+      const reportDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const activeBlocks = data.blocks.filter(b => b.status === 'active').length;
+      const totalSales = data.sales.reduce((s, x) => s + (x.total || 0), 0);
+      const totalMeals = data.feeding.reduce((s, x) => s + (x.mealsServed || 0), 0);
+      const harvestQty = data.harvests.reduce((s, h) => s + (h.quantity || 0), 0);
+
+      let html = `
+        <h1>School Garden Report</h1>
+        <div class="report-meta">Generated: ${reportDate} · Garden Blocks Manager</div>
+        <div class="report-summary">
+          <div class="report-stat"><div class="rl">Active Blocks</div><div class="rv">${activeBlocks}</div></div>
+          <div class="report-stat"><div class="rl">Plantings</div><div class="rv">${data.plantings.length}</div></div>
+          <div class="report-stat"><div class="rl">Harvests</div><div class="rv">${data.harvests.length} <span style="font-size:0.75rem;font-weight:500">(${harvestQty} units)</span></div></div>
+          <div class="report-stat"><div class="rl">Sales Revenue</div><div class="rv" style="font-size:1rem">${formatMoney(totalSales)}</div></div>
+          <div class="report-stat"><div class="rl">Meals Supported</div><div class="rv">${totalMeals}</div></div>
+          <div class="report-stat"><div class="rl">Activities Logged</div><div class="rv">${data.activities.length}</div></div>
+        </div>
+      `;
+
+      // Blocks
+      html += `<h2>Garden Blocks</h2><table><thead><tr><th>Name</th><th>Status</th><th>Size</th><th>Crops</th></tr></thead><tbody>`;
+      data.blocks.forEach(b => {
+        const n = plantingsFor(b.id).length;
+        html += `<tr><td>${b.name}</td><td>${b.status}</td><td>${b.size || '—'}</td><td>${n}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+
+      // Plantings
+      html += `<h2>Crops & Plantings</h2><table><thead><tr><th>Crop</th><th>Block</th><th>Qty</th><th>Planted</th><th>Stage</th></tr></thead><tbody>`;
+      data.plantings.forEach(p => {
+        const bl = getBlock(p.blockId);
+        html += `<tr><td>${p.crop}${p.variety ? ' (' + p.variety + ')' : ''}</td><td>${bl ? bl.name : '—'}</td><td>${p.quantity}</td><td>${formatDate(p.plantedDate)}</td><td>${p.stage || '—'}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+
+      // Harvests
+      html += `<h2>Harvests</h2>`;
+      if (!data.harvests.length) {
+        html += `<p style="color:#6b7280">No harvests recorded.</p>`;
+      } else {
+        html += `<table><thead><tr><th>Date</th><th>Crop</th><th>Qty</th><th>Quality</th><th>By</th></tr></thead><tbody>`;
+        [...data.harvests].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(h => {
+          html += `<tr><td>${formatDate(h.date)}</td><td>${h.crop}</td><td>${h.quantity} ${h.unit || ''}</td><td>${h.quality || '—'}</td><td>${h.harvestedBy || '—'}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      // Sales
+      html += `<h2>Sales</h2>`;
+      if (!data.sales.length) {
+        html += `<p style="color:#6b7280">No sales recorded.</p>`;
+      } else {
+        html += `<table><thead><tr><th>Date</th><th>Crop</th><th>Qty</th><th>Total</th><th>Buyer</th></tr></thead><tbody>`;
+        [...data.sales].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(s => {
+          html += `<tr><td>${formatDate(s.date)}</td><td>${s.crop}</td><td>${s.quantity} ${s.unit || ''}</td><td>${formatMoney(s.total)}</td><td>${s.buyer || '—'}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+        html += `<p style="font-weight:600;margin-top:0.4rem">Total revenue: ${formatMoney(totalSales)}</p>`;
+      }
+
+      // Feeding
+      html += `<h2>Feeding Programme</h2>`;
+      if (!data.feeding.length) {
+        html += `<p style="color:#6b7280">No feeding records.</p>`;
+      } else {
+        html += `<table><thead><tr><th>Date</th><th>Crop</th><th>Qty Used</th><th>Meals</th></tr></thead><tbody>`;
+        [...data.feeding].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(f => {
+          html += `<tr><td>${formatDate(f.date)}</td><td>${f.crop}</td><td>${f.quantity} ${f.unit || ''}</td><td>${f.mealsServed || 0}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+        html += `<p style="font-weight:600;margin-top:0.4rem">Total meals supported: ${totalMeals}</p>`;
+      }
+
+      // Recent activities (last 15)
+      html += `<h2>Recent Activities</h2>`;
+      const acts = [...data.activities].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
+      if (!acts.length) {
+        html += `<p style="color:#6b7280">No activities logged.</p>`;
+      } else {
+        html += `<table><thead><tr><th>Date</th><th>Type</th><th>Block</th><th>By</th></tr></thead><tbody>`;
+        acts.forEach(a => {
+          const bl = getBlock(a.blockId);
+          html += `<tr><td>${formatDate(a.date)}</td><td>${a.type}</td><td>${bl ? bl.name : '—'}</td><td>${a.performedBy || '—'}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      html += `<p style="margin-top:1.5rem;font-size:0.75rem;color:#9ca3af">End of report · School Garden Blocks Manager</p>`;
+      return html;
+    }
+
+    function openReport() {
+      document.getElementById('report-body').innerHTML = buildReportHTML();
+      document.getElementById('report-overlay').classList.add('open');
+    }
+
+    function closeReport() {
+      document.getElementById('report-overlay').classList.remove('open');
+    }
+
+    function printReport() {
+      document.getElementById('report-body').innerHTML = buildReportHTML();
+      document.getElementById('report-overlay').classList.add('open');
+      setTimeout(() => window.print(), 200);
+    }
+
+    function downloadReport() {
+      const bodyContent = buildReportHTML();
+      const fullHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>School Garden Report – ${new Date().toISOString().slice(0,10)}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 1.5rem auto; padding: 0 1rem; color: #1a2e22; line-height: 1.45; }
+    h1 { color: #1b4332; font-size: 1.5rem; margin-bottom: 0.25rem; }
+    h2 { color: #2d6a4f; font-size: 1.1rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid #d8f3dc; padding-bottom: 0.3rem; }
+    .report-meta { color: #6b7280; font-size: 0.85rem; margin-bottom: 1.25rem; }
+    .report-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+    .report-stat { background: #f0fdf4; border-radius: 10px; padding: 0.75rem; }
+    .rl { font-size: 0.7rem; color: #6b7280; text-transform: uppercase; }
+    .rv { font-size: 1.2rem; font-weight: 700; color: #1b4332; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    th, td { text-align: left; padding: 0.45rem 0.4rem; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f0fdf4; font-weight: 600; }
+    @media print { body { margin: 0; } }
+  </style>
+</head>
+<body>
+${bodyContent}
+</body>
+</html>`;
+      const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `garden-report-${new Date().toISOString().slice(0,10)}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Report downloaded');
+    }
+
+    document.getElementById('report-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeReport();
+    });
+
+    // PWA
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('btn-install').style.display = 'grid';
+      document.getElementById('install-banner').classList.add('show');
+    });
+    function triggerInstall() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        document.getElementById('btn-install').style.display = 'none';
+        document.getElementById('install-banner').classList.remove('show');
+      });
+    }
+    document.getElementById('btn-install').addEventListener('click', triggerInstall);
+    document.getElementById('btn-install-banner').addEventListener('click', triggerInstall);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
